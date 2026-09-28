@@ -1,0 +1,35 @@
+diff --git a/libvmaf/src/feature/x86/adm_avx2.c b/libvmaf/src/feature/x86/adm_avx2.c
+index ce3246a..fde7306 100644
+--- a/libvmaf/src/feature/x86/adm_avx2.c
++++ b/libvmaf/src/feature/x86/adm_avx2.c
+@@ -2915,7 +2915,7 @@ void adm_dwt2_16_avx2(const uint16_t *src, const adm_dwt_band_t *dst, AdmBuffer
+ 
+     __m256i  accum0_lo, accum0_hi;
+ 
+-    int half_w_mod16 = ((w + 1) / 2) - ((((w + 1) / 2) - 1) % 16);
++    int half_w_mod16 = (((w + 1) / 2) - 2) - ((((w + 1) / 2) - 3) % 16);
+ 
+     for (int i = 0; i < (h + 1) / 2; ++i) {
+         /* Vertical pass. */
+diff --git a/libvmaf/src/feature/x86/adm_avx512.c b/libvmaf/src/feature/x86/adm_avx512.c
+index 8aeef80..bd85666 100644
+--- a/libvmaf/src/feature/x86/adm_avx512.c
++++ b/libvmaf/src/feature/x86/adm_avx512.c
+@@ -3007,7 +3007,7 @@ void adm_dwt2_16_avx512(const uint16_t *src, const adm_dwt_band_t *dst, AdmBuffe
+     //__m512i norm_hi = _mm512_set1_epi32((int32_t)dwt2_db2_coeffs_hi_sum * add_shift_VP);
+ 
+     //int w_mod32 = (w  - (w  % 32));
+-    int half_w_mod64 = ((w + 1) / 2) - ((((w + 1) / 2) - 1) % 64);
++    int half_w_mod64 = (((w + 1) / 2) - 2) - ((((w + 1) / 2) - 3) % 64);
+ 
+     for (int i = 0; i < (h + 1) / 2; ++i) {
+         /* Vertical pass. */
+@@ -3297,7 +3297,7 @@ void adm_dwt2_8_avx512(const uint8_t *src, const adm_dwt_band_t *dst,
+     __m512i add_shift_HP_vex = _mm512_set1_epi32(32768);
+ 
+     int w_mod_32 = (w >> 5) << 5;
+-    int half_w_mod_32 = ((w + 1) / 2) - ((((w + 1) / 2) - 1) % 32);
++    int half_w_mod_32 = (((w + 1) / 2) - 2) - ((((w + 1) / 2) - 3) % 32);
+ 
+     for (int i = 0; i < (h + 1) / 2; ++i) {
+         /* Vertical pass. */
