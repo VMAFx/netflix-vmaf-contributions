@@ -26,11 +26,11 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
       - name: Cache ccache files
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             .ccache
@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.msystem }}-0-
             ${{ runner.os }}-${{ matrix.msystem }}-
 
-      - uses: msys2/setup-msys2@v2
+      - uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2
         with:
           msystem: ${{ matrix.msystem }}
           install: ${{ matrix.MINGW_PACKAGE_PREFIX }}-ccache ${{ matrix.MINGW_PACKAGE_PREFIX }}-nasm ${{ matrix.MINGW_PACKAGE_PREFIX }}-pkg-config ${{ matrix.MINGW_PACKAGE_PREFIX }}-gcc ${{ matrix.MINGW_PACKAGE_PREFIX }}-meson ${{ matrix.MINGW_PACKAGE_PREFIX }}-ninja vim make diffutils
@@ -65,13 +65,13 @@ jobs:
           echo "upload_url=$(curl -L https://api.github.com/repos/${{ github.repository }}/releases/tags/$(cut -d/ -f3 <<< ${{ github.ref }}) | jq -r ."upload_url")" >> $GITHUB_OUTPUT
 
       - name: Upload vmaf
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.msystem }}-vmaf
           path: ${{ steps.get_info.outputs.path }}
       - name: Upload vmaf
         if: steps.get_info.outputs.upload_url != 'null' && matrix.msystem == 'UCRT64'
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
