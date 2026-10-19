@@ -286,7 +286,16 @@ class Result(BasicResult):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    # TODO: add __repr__, __hash__
+    def __hash__(self):
+        # __eq__ requires equal asset and executor_id, so hashing on them keeps
+        # equal results hashing equal; scores are left out as they are
+        # unhashable (lists, np.ndarray)
+        return hash((self.asset, self.executor_id))
+
+    def __repr__(self):
+        return '{}(asset={!r}, executor_id={!r}, scores_keys={!r})'.format(
+            self.__class__.__name__, str(self.asset), self.executor_id,
+            self.get_ordered_list_scores_key())
 
     def __str__(self):
         return self.to_string()

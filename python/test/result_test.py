@@ -281,6 +281,32 @@ class ResultAggregatingTest(MyTestCase):
             assert combined_result.result_dict[key][len(combined_result.result_dict[key]) - 1] == results[1].result_dict[key][len(results[1].result_dict[key]) - 1]
 
 
+class ResultHashReprTest(unittest.TestCase):
+
+    def setUp(self):
+        self.asset = Asset(dataset="test", content_id=0, asset_id=0,
+                           workdir_root=VmafConfig.workdir_path(),
+                           ref_path="dir/refvideo.yuv",
+                           dis_path="dir/disvideo.yuv",
+                           asset_dict={'width': 720, 'height': 480})
+
+    def test_hash_consistent_with_eq(self):
+        result = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        result_same = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        result_other_executor = Result(self.asset, 'PSNR_V1.0', {'PSNR_scores': [30.0, 31.0]})
+        self.assertEqual(result, result_same)
+        self.assertEqual(hash(result), hash(result_same))
+        self.assertEqual(len({result, result_same, result_other_executor}), 2)
+
+    def test_repr(self):
+        result = Result(self.asset, 'VMAF_V0.6.1',
+                        {'VMAF_scores': [1.0, 2.0], 'VMAF_feature_vif_scores': [0.5, 0.6]})
+        self.assertEqual(
+            repr(result),
+            "Result(asset='test_0_0_refvideo_720x480_vs_disvideo_720x480_q_720x480', "
+            "executor_id='VMAF_V0.6.1', scores_keys=['VMAF_feature_vif_scores', 'VMAF_scores'])")
+
+
 class ScoreAggregationTest(unittest.TestCase):
 
     def tearDown(self):
