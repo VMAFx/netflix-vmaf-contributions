@@ -286,7 +286,15 @@ class Result(BasicResult):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    # TODO: add __repr__, __hash__
+    def __hash__(self):
+        # defining __eq__ sets __hash__ to None; hash only on what __eq__
+        # compares and is itself hashable, so equal results hash equally
+        return hash((self.asset, self.executor_id))
+
+    def __repr__(self):
+        return '{}(asset={}, executor_id={!r}, scores_keys={!r})'.format(
+            self.__class__.__name__, str(self.asset), self.executor_id,
+            self.get_ordered_list_scores_key())
 
     def __str__(self):
         return self.to_string()

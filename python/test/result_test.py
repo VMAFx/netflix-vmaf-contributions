@@ -233,6 +233,23 @@ class ResultStoreTestWithNone(MyTestCase):
         self.assertEqual(result.asset.__class__, Asset)
 
 
+class ResultHashReprTest(MyTestCase):
+
+    def test_hash_and_repr(self):
+
+        result_path = VmafConfig.test_resource_path('result_with_none.txt')
+        result = FileSystemResultStore.load_result(result_path)
+        result2 = FileSystemResultStore.load_result(result_path)
+        self.assertEqual(result, result2)
+        self.assertEqual(hash(result), hash(result2))
+        self.assertEqual(len({result, result2}), 1)
+        self.assertEqual({result: 1}[result2], 1)
+        self.assertEqual(repr(result),
+                         "Result(asset={}, executor_id={!r}, scores_keys={!r})".format(
+                             str(result.asset), result.executor_id,
+                             result.get_ordered_list_scores_key()))
+
+
 class ResultAggregatingTest(MyTestCase):
 
     def test_from_xml_from_json_and_aggregation(self):
