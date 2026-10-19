@@ -279,14 +279,21 @@ class Result(BasicResult):
             return False
         list_scores_key = self.get_ordered_list_scores_key()
         for scores_key in list_scores_key:
-            if self.result_dict[scores_key] != other.result_dict[scores_key]:
+            if not np.array_equal(self.result_dict[scores_key], other.result_dict[scores_key]):
                 return False
         return True
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    # TODO: add __repr__, __hash__
+    def __hash__(self):
+        # scores are excluded: they are mutable and equal results always
+        # share asset and executor_id, so this stays consistent with __eq__
+        return hash((self.asset, self.executor_id))
+
+    def __repr__(self):
+        return '{}(asset={!r}, executor_id={!r})'.format(
+            type(self).__name__, self.asset, self.executor_id)
 
     def __str__(self):
         return self.to_string()
