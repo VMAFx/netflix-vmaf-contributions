@@ -186,6 +186,16 @@ class ResultFormattingTest(MyTestCase):
 }
         """))
 
+    def test_eq_hash_repr(self):
+        other = FileSystemResultStore.load_result(VmafConfig.test_resource_path('ssim_result_for_test.txt'))
+        self.assertEqual(self.result, other)
+        self.assertEqual(hash(self.result), hash(other))
+        self.assertEqual(len({self.result, other}), 1)
+        other.result_dict['SSIM_scores'] = np.array(other.result_dict['SSIM_scores']) + 0.1
+        self.assertNotEqual(self.result, other)
+        self.assertEqual(repr(self.result),
+                         'Result(asset={!r}, executor_id={!r})'.format(self.result.asset, 'SSIM_V1.0'))
+
 
 class ResultStoreTest(MyTestCase):
 
