@@ -330,5 +330,30 @@ class ScoreAggregationTest(unittest.TestCase):
             x = self.result['VMAF_3D_array_score']
 
 
+class ResultHashReprTest(unittest.TestCase):
+
+    def setUp(self):
+        self.asset = Asset(dataset="test", content_id=0, asset_id=0,
+                           ref_path="dir/refvideo.yuv", dis_path="dir/disvideo.yuv",
+                           asset_dict={'width': 1920, 'height': 1080})
+
+    def test_equal_results_hash_equal(self):
+        r1 = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        r2 = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        self.assertEqual(r1, r2)
+        self.assertEqual(hash(r1), hash(r2))
+        self.assertEqual(len({r1, r2}), 1)
+
+    def test_different_executor_not_equal(self):
+        r1 = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        r2 = Result(self.asset, 'PSNR_V1.0', {'VMAF_scores': [1.0, 2.0]})
+        self.assertNotEqual(r1, r2)
+        self.assertEqual(len({r1, r2}), 2)
+
+    def test_repr(self):
+        r = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        self.assertEqual(repr(r), "Result(asset={!r}, executor_id='VMAF_V0.6.1')".format(self.asset))
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
