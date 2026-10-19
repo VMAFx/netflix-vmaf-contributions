@@ -50,7 +50,7 @@ jobs:
       CROSS: ${{ matrix.CROSS }}
     steps:
       - name: Setup python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: 3.11
       - name: Install meson and ninja
@@ -87,7 +87,7 @@ jobs:
           meson --version
           ccache --version
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Run meson
         run: |
           meson setup libvmaf libvmaf/build --buildtype release --prefix $PWD/install -Denable_float=true ${CROSS:+--cross-file $CROSS}
@@ -128,13 +128,13 @@ jobs:
           echo "zip_path=$zip_path" >> $GITHUB_OUTPUT
 
       - name: Upload vmaf
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: vmaf-${{ matrix.name }}
           path: ${{ steps.package.outputs.zip_path }}
       - name: Upload vmaf
         if: steps.get_info.outputs.upload_url != 'null'
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
