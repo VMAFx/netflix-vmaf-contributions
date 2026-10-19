@@ -154,6 +154,11 @@ test_barten_csf = executable('test_barten_csf',
     dependencies : math_lib,
 )
 
+test_iqa_convolve = executable('test_iqa_convolve',
+    ['test.c', 'test_iqa_convolve.c', '../src/feature/iqa/convolve.c'],
+    include_directories : [libvmaf_inc, test_inc, include_directories('../src/')],
+)
+
 test_motion_blend = executable('test_motion_blend',
     ['test.c', 'test_motion_blend.c'],
     include_directories : [libvmaf_inc, test_inc, include_directories('../src/')],
@@ -227,6 +232,7 @@ test('test_propagate_metadata', test_propagate_metadata)
 test('test_adm_csf', test_adm_csf)
 test('test_barten_csf', test_barten_csf)
 test('test_motion_blend', test_motion_blend)
+test('test_iqa_convolve', test_iqa_convolve)
 
 if is_asm_enabled and (host_machine.cpu_family().startswith('arm64') or host_machine.cpu_family().startswith('aarch64'))
     test_motion_neon = executable('test_motion_neon',
