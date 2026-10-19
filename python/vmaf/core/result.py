@@ -273,20 +273,33 @@ class Result(BasicResult):
         self.executor_id = executor_id
 
     def __eq__(self, other):
+        if not isinstance(other, Result):
+            return NotImplemented
         if self.asset != other.asset:
             return False
         if self.executor_id != other.executor_id:
             return False
         list_scores_key = self.get_ordered_list_scores_key()
+        if list_scores_key != other.get_ordered_list_scores_key():
+            return False
         for scores_key in list_scores_key:
-            if self.result_dict[scores_key] != other.result_dict[scores_key]:
+            # scores can be numpy arrays, so compare elementwise
+            if not np.array_equal(self.result_dict[scores_key], other.result_dict[scores_key]):
                 return False
         return True
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        eq = self.__eq__(other)
+        return eq if eq is NotImplemented else not eq
 
-    # TODO: add __repr__, __hash__
+    def __hash__(self):
+        # must agree with __eq__: equal results share asset and executor_id
+        return hash((self.asset, self.executor_id))
+
+    def __repr__(self):
+        return '{}(asset={!r}, executor_id={!r}, scores_keys={!r})'.format(
+            type(self).__name__, self.asset, self.executor_id,
+            self.get_ordered_list_scores_key())
 
     def __str__(self):
         return self.to_string()
