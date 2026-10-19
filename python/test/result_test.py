@@ -233,6 +233,33 @@ class ResultStoreTestWithNone(MyTestCase):
         self.assertEqual(result.asset.__class__, Asset)
 
 
+class ResultHashReprTest(MyTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.asset = Asset(dataset="test", content_id=0, asset_id=0,
+                           workdir_root=VmafConfig.workdir_path(),
+                           ref_path="ref.yuv", dis_path="dis.yuv",
+                           asset_dict={'width': 1920, 'height': 1080})
+
+    def test_equal_results_hash_equal(self):
+        r1 = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        r2 = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0, 2.0]})
+        self.assertEqual(r1, r2)
+        self.assertEqual(hash(r1), hash(r2))
+        self.assertEqual(len({r1, r2}), 1)
+
+    def test_different_executor_not_equal(self):
+        r1 = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0]})
+        r2 = Result(self.asset, 'PSNR_V1.0', {'PSNR_scores': [1.0]})
+        self.assertNotEqual(r1, r2)
+        self.assertEqual(len({r1, r2}), 2)
+
+    def test_repr(self):
+        r = Result(self.asset, 'VMAF_V0.6.1', {'VMAF_scores': [1.0]})
+        self.assertEqual(repr(r), "Result(asset={!r}, executor_id='VMAF_V0.6.1')".format(self.asset))
+
+
 class ResultAggregatingTest(MyTestCase):
 
     def test_from_xml_from_json_and_aggregation(self):

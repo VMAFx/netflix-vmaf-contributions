@@ -286,7 +286,13 @@ class Result(BasicResult):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    # TODO: add __repr__, __hash__
+    def __hash__(self):
+        # consistent with __eq__: equal results share asset and executor_id
+        return hash((self.asset, self.executor_id))
+
+    def __repr__(self):
+        return '{cls}(asset={asset!r}, executor_id={executor_id!r})'.format(
+            cls=self.__class__.__name__, asset=self.asset, executor_id=self.executor_id)
 
     def __str__(self):
         return self.to_string()
