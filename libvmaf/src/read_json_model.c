@@ -76,7 +76,9 @@ static int parse_feature_opts_dicts(json_stream *s, VmafModel *model)
                 free(key);
                 if (err) return err;
             } else {
-                return -EINVAL; //TODO
+                // only number, bool and string option values are supported
+                free(key);
+                return -EINVAL;
             }
             json_skip(s);
         }
