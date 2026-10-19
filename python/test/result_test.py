@@ -125,6 +125,38 @@ class ResultTest(MyTestCase):
             self.result.get_result('VMAF_motion_score')
 
 
+class ResultEqHashReprTest(unittest.TestCase):
+
+    def _make(self, scores, executor_id='VMAF_V0.6.1', asset='asset_a'):
+        return Result(asset, executor_id, {'VMAF_scores': np.array(scores),
+                                           'VMAF_feature_vif_scores': np.array(scores)})
+
+    def test_eq_with_numpy_scores(self):
+        self.assertEqual(self._make([1.0, 2.0]), self._make([1.0, 2.0]))
+        self.assertNotEqual(self._make([1.0, 2.0]), self._make([1.0, 3.0]))
+        self.assertNotEqual(self._make([1.0, 2.0]), self._make([1.0, 2.0], executor_id='SSIM_V1.0'))
+        self.assertNotEqual(self._make([1.0, 2.0]), self._make([1.0, 2.0], asset='asset_b'))
+        self.assertNotEqual(self._make([1.0, 2.0]), 'not a result')
+
+    def test_eq_with_different_scores_keys(self):
+        r1 = self._make([1.0, 2.0])
+        r2 = Result('asset_a', 'VMAF_V0.6.1', {'VMAF_scores': np.array([1.0, 2.0])})
+        self.assertNotEqual(r1, r2)
+        self.assertNotEqual(r2, r1)
+
+    def test_hash(self):
+        r1 = self._make([1.0, 2.0])
+        r2 = self._make([1.0, 2.0])
+        self.assertEqual(hash(r1), hash(r2))
+        self.assertEqual(len({r1, r2, self._make([1.0, 3.0])}), 2)
+
+    def test_repr(self):
+        self.assertEqual(
+            repr(self._make([1.0, 2.0])),
+            "Result(asset='asset_a', executor_id='VMAF_V0.6.1', "
+            "scores_keys=['VMAF_feature_vif_scores', 'VMAF_scores'])")
+
+
 class ResultFormattingTest(MyTestCase):
 
     def setUp(self):
