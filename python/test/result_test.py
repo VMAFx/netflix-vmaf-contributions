@@ -281,6 +281,26 @@ class ResultAggregatingTest(MyTestCase):
             assert combined_result.result_dict[key][len(combined_result.result_dict[key]) - 1] == results[1].result_dict[key][len(results[1].result_dict[key]) - 1]
 
 
+class ResultHashReprTest(unittest.TestCase):
+
+    def setUp(self):
+        self.asset = Asset(dataset="test", content_id=0, asset_id=0,
+                           ref_path="dir/refvideo.yuv", dis_path="dir/disvideo.yuv",
+                           asset_dict={'width': 1920, 'height': 1080})
+        self.result_dict = {'VMAF_scores': [80.0, 90.0]}
+
+    def test_hash_consistent_with_eq(self):
+        r1 = Result(self.asset, 'VMAF_V0.6.1', dict(self.result_dict))
+        r2 = Result(self.asset, 'VMAF_V0.6.1', dict(self.result_dict))
+        self.assertEqual(r1, r2)
+        self.assertEqual(hash(r1), hash(r2))
+        self.assertEqual(len({r1, r2}), 1)
+
+    def test_repr(self):
+        r = Result(self.asset, 'VMAF_V0.6.1', self.result_dict)
+        self.assertEqual(repr(r), "Result(asset={!r}, executor_id='VMAF_V0.6.1')".format(self.asset))
+
+
 class ScoreAggregationTest(unittest.TestCase):
 
     def tearDown(self):
