@@ -94,7 +94,7 @@ static char *test_json_model_unsupported_feature_opt()
 {
     int err = 0;
 
-    const char *json =
+    static const char json[] =
         "{\"model_dict\": {"
         "\"feature_names\": [\"VMAF_feature_adm2_score\"],"
         "\"feature_opts_dicts\": [{\"opt\": null}]"
@@ -102,7 +102,7 @@ static char *test_json_model_unsupported_feature_opt()
 
     VmafModel *model;
     VmafModelConfig cfg = { 0 };
-    err = vmaf_read_json_model_from_buffer(&model, &cfg, json, strlen(json));
+    err = vmaf_read_json_model_from_buffer(&model, &cfg, json, sizeof(json) - 1);
     mu_assert("unsupported feature option value type must be rejected",
               err == -EINVAL);
 
