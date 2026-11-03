@@ -1024,12 +1024,13 @@ int vmaf_read_pictures(VmafContext *vmaf, VmafPicture *ref, VmafPicture *dist,
     int err = convert_pictures(vmaf, ref, dist);
     if (err) return err;
 
-    vmaf->pic_cnt++;
     err = validate_pic_params(vmaf, ref, dist);
     if (err) return err;
 
     err = check_picture_pool(vmaf);
     if (err) return err;
+
+    vmaf->pic_cnt++;
 
 #ifdef HAVE_CUDA
     err = check_ring_buffer(vmaf);
