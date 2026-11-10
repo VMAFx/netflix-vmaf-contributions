@@ -16,8 +16,13 @@ jobs:
             os: ubuntu-latest
             CC: ccache gcc
             CXX: ccache g++
-          - name: linux-x86_64-gcc-9
+          - name: linux-x86_64-gcc-zimg
             os: ubuntu-latest
+            CC: ccache gcc
+            CXX: ccache g++
+            ZIMG: -Denable_zimg=true
+          - name: linux-x86_64-gcc-9
+            os: ubuntu-22.04
             CC: ccache gcc-9
             CXX: ccache g++-9
           - name: linux-x86_64-clang
@@ -48,9 +53,10 @@ jobs:
       CC: ${{ matrix.CC }}
       CXX: ${{ matrix.CXX }}
       CROSS: ${{ matrix.CROSS }}
+      ZIMG: ${{ matrix.ZIMG }}
     steps:
       - name: Setup python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: 3.11
       - name: Install meson and ninja
@@ -59,7 +65,7 @@ jobs:
           pip install meson
 
       - name: Install dependencies (ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo -E apt-get -yq install ccache ninja-build libomp-dev
@@ -73,6 +79,9 @@ jobs:
           esac
           if [ -n "$CROSS" ]; then
             sudo -E apt-get -yq install gcc-multilib g++-multilib
+          fi
+          if [ -n "$ZIMG" ]; then
+            sudo -E apt-get -yq install pkg-config libzimg-dev
           fi
           $CC --version
           meson --version
@@ -90,7 +99,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Run meson
         run: |
-          meson setup libvmaf libvmaf/build --buildtype release --prefix $PWD/install -Denable_float=true ${CROSS:+--cross-file $CROSS}
+          meson setup libvmaf libvmaf/build --buildtype release --prefix $PWD/install -Denable_float=true $ZIMG ${CROSS:+--cross-file $CROSS}
       - name: Run ninja
         run: |
           sudo ninja -vC libvmaf/build install
@@ -102,7 +111,7 @@ jobs:
           mkdir -p ~/.ccache && sudo chown -R $(whoami) ~/.ccache
           pip install tox
       - name: Run tox tests (ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-22.04'
         run: |
           tox -c python
       - name: Run tox tests (mac)
@@ -133,7 +142,7 @@ jobs:
           name: vmaf-${{ matrix.name }}
           path: ${{ steps.package.outputs.zip_path }}
       - name: Upload vmaf
-        if: steps.get_info.outputs.upload_url != 'null'
+        if: steps.get_info.outputs.upload_url != 'null' && !matrix.ZIMG
         uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
