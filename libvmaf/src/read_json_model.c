@@ -77,7 +77,11 @@ static int parse_feature_opts_dicts(json_stream *s, VmafModel *model)
                 free(key);
                 if (err) return err;
             } else {
-                return -EINVAL; //TODO
+                // Feature options are scalars: only number, boolean and
+                // string values are accepted. Reject anything else (null,
+                // arrays, objects) without leaking the duplicated key.
+                free(key);
+                return -EINVAL;
             }
             json_skip(s);
         }
